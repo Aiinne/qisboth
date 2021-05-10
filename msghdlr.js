@@ -6922,7 +6922,7 @@ module.exports = msgHdlr = async (client , mek) => {
                 console.log(color(time_error, "white"), color("[  ERROR  ]", "aqua"), color(e, 'red'))
             }
         }
-
+    }
 
 
 
