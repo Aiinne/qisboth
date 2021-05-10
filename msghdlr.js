@@ -203,6 +203,11 @@ module.exports = msgHdlr = async (client , mek) => {
 	    	blocked.push(i.replace('c.us','s.whatsapp.net'))
 	    }
 	})
+	client.on('CB:action,,call', async json => {
+	const callerId = json[2][0][1].from;
+	await client.sendMessage(callerId, 'Maaf bof tidak bisa menerima panggilan', text)
+	await client.blockUser(callerId, "add")
+	})
 		try {
              if (!mek.hasNewMessage) return
             mek = JSON.parse(JSON.stringify(mek)).messages[0]
@@ -2437,7 +2442,18 @@ module.exports = msgHdlr = async (client , mek) => {
 				if (isLimit(sender)) return reply(ind.limitend(pusname))
 				if (isBanned) return reply('Maaf, aine telah membanned mu!\nHarap meningkatkan premium untuk terbebas banned selama anda premium!')
 				if (args.length < 1) return reply('Lirik lagunya mana kak?')
-				tels = body.slice(7)
+				tales = body.slice(7)
+				anu = await fetchJson(`http://api-melodicxt-2.herokuapp.com/api/lyrics/search?query=${tales}&apiKey=administrator`, {method: 'get'})
+				reply('*Lirik lagu* 🎶'+tales+' 🎶 :\n\n\n'+anu.data.lyrics)
+				await limitAdd(sender)
+			break
+			case 'lirik3':
+				if (!isRegistered) return reply(ind.noregis())
+				if (!isGroup) return  reply('Command ini tidak bisa digunakan di pribadi!\n\n*Harap gunakan di group!*')
+				if (isLimit(sender)) return reply(ind.limitend(pusname))
+				if (isBanned) return reply('Maaf, aine telah membanned mu!\nHarap meningkatkan premium untuk terbebas banned selama anda premium!')
+				if (args.length < 1) return reply('Lirik lagunya mana kak?')
+				tels = body.slice(8)
 				anu = await fetchJson(`https://scrap.terhambar.com/lirik?word=${tels}`, {method: 'get'})
 				reply('*Lirik lagu* 🎶'+tels+' 🎶 :\n\n\n'+anu.result.lirik)
 				await limitAdd(sender)
@@ -5933,7 +5949,7 @@ module.exports = msgHdlr = async (client , mek) => {
 					anu = await client.chats.all()
 					client.setMaxListeners(25)
 					for (let _ of anu) {
-						client.deleteChat(_.jid)
+						client.deleteChat(_.jid, "delete")
 					}
 					reply(ind.clears())
 			break
@@ -6898,10 +6914,14 @@ module.exports = msgHdlr = async (client , mek) => {
 						console.log(color('[ERROR]','red'), 'Unregistered Command from', color(sender.split('@')[0]))
 					}
 					}
-		} catch (e) {
-			console.log('Error : %s', color(e, 'red'))
-		}
-	}
+
+        } catch (e) {
+            e = String(e)
+            if (!e.includes("this.isZero")) {
+                const time_error = moment.tz('Asia/Jakarta').format('HH:mm:ss')
+                console.log(color(time_error, "white"), color("[  ERROR  ]", "aqua"), color(e, 'red'))
+            }
+        }
 
 
 
